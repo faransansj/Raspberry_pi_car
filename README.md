@@ -1,6 +1,6 @@
 # Raspberry_pi_car
-- Trouble & Shooting
-    RuntimeError: No access to /dev/mem try running as root
+- **Trouble & Shooting**
+  RuntimeError: No access to /dev/mem try running as root
   - **에러 원인**   
   Raspberry pi에서 GPIO pin에 접근할 때 일반 사용자로 접근하여 권한이 충분하지 않아서 생긴 문제입니다.
   - **해결 방안**
