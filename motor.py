@@ -1,54 +1,104 @@
 import RPi.GPIO as GPIO
-from gpiozero import Motor 
-import time
+from time import sleep
+import math
 
-# Servo motor setting 
+# motor state
+STOP = 0
+FORWARD = 1
+BACKWARD = 2
+
+# motor channel state
+CH1 = 0
+CH2 = 1
+
+# Define pin (BCM)
+# DC motor driver pin
+ENA = 26
+ENB = 0
+
+IN1 = 19
+IN2 = 13
+IN3 = 6
+IN4 = 5
+# servo motor pin
 servoPIN = 17
+
+# motor value collection 
+# motor_A_value 
+# motor_B_value 
+
+#pin setting function 
+def setPinConfig(EN, INA, INB):
+    #set DC motor pinconfig
+             
+    GPIO.setup(EN, GPIO.OUT)
+    GPIO.setup(INA, GPIO.OUT)
+    GPIO.setup(INB, GPIO.OUT)
+    # 100khz activate 
+    pwm = GPIO.PWM(EN, 100) 
+    # stop PWM    
+    pwm.start(0) 
+    return pwm
+
+    #set Servo motor pinconfig
+    GPIO.setup(servoPIN,GPIO.OUT)
+    # GPIO 17 for PWM with 50Hz
+    servo = GPIO.PWM(servoPIN, 50) 
+    # Initialization
+    servo.start(2.5) 
+
+# motor control function
+def setMotorContorl(pwm, INA, INB, speed, stat):
+
+    #motor  PWM
+    pwm.ChangeDutyCycle(speed)  
+    
+    if stat == FORWARD:
+        GPIO.output(INA, HIGH)
+        GPIO.output(INB, LOW)
+        
+    elif stat == BACKWARD:
+        GPIO.output(INA, LOW)
+        GPIO.output(INB, HIGH)
+        
+    elif stat == STOP:
+        GPIO.output(INA, LOW)
+        GPIO.output(INB, LOW)
+
+def setMotor(ch, speed, stat):
+    if ch == CH1:
+        setMotorContorl(pwmA, IN1, IN2, speed, stat)
+    else:
+        setMotorContorl(pwmB, IN3, IN4, speed, stat)
+  
+
+# set gpio mode 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(servoPIN, GPIO.OUT)
+      
+# set motor pin 
+# get pwm handdle  
+pwmA = setPinConfig(ENA, IN1, IN2)
+pwmB = setPinConfig(ENB, IN3, IN4)
 
-p = GPIO.PWM(servoPIN, 50) # GPIO 17 for PWM with 50Hz
-p.start(2.5) # Initialization
+# 앞으로 80프로 속도로
+setMotor(CH1, 80, FORWARD)
+setMotor(CH2, 80, FORWARD)
+#5초 대기
+sleep(5)
 
-# DC motor setting 
-motor_R = Motor(16,19)
-motor_L = Motor(21,20)
+# 뒤로 40프로 속도로
+setMotor(CH1, 40, BACKWARD)
+setMotor(CH2, 40, BACKWARD)
+sleep(5)
 
-while True:
-    try:
-        # Servo motor control
-        angle = float(input("Enter angle (0 to 90): "))
-        if 0 <= angle <= 90:
-            duty = angle / 18.0 + 2.5
-            p.ChangeDutyCycle(duty)
-        else:
-            print("Angle out of range.")
+# 뒤로 100프로 속도로
+setMotor(CH1, 100, BACKWARD)
+setMotor(CH2, 100, BACKWARD)
+sleep(5)
 
-        # DC motor control
-        dc1 = float(input("Enter speed for DC Motor 1 (-1 to 1): "))
-        dc2 = float(input("Enter speed for DC Motor 2 (-1 to 1): "))
+#정지 
+setMotor(CH1, 80, STOP)
+setMotor(CH2, 80, STOP)
 
-        # DC1 control
-        if -1 <= dc1 <= 1:
-            if dc1 > 0:
-                motor_R.forward(dc1)
-            elif dc1 < 0:
-                motor_R.backward(abs(dc1))
-            else:
-                motor_R.stop()
-        else:
-            print("Speed for Motor 1 out of range.")
-
-        # DC2 control
-        if -1 <= dc2 <= 1:
-            if dc2 > 0:
-                motor_L.forward(dc2)
-            elif dc2 < 0:
-                motor_L.backward(abs(dc2))
-            else:
-                motor_L.stop()
-        else:
-            print("Speed for Motor 2 out of range.")
-
-    except ValueError:
-        print("Invalid input. Please enter a valid number.")
+# 종료
+GPIO.cleanup()
