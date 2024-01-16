@@ -7,9 +7,9 @@ import math
 \\\\\\\\\\\\\\\\\\\\\\\\\
 '''
 # PID parameter
-Kp = 1.0  # Proportional
-Ki = 0.0  # Integral
-Kd = 0.0  # Derivative
+Kp = 0.4      # Proportional
+Ki = 0.0      # Integral
+Kd = Kp*0.65  # Derivative
 
 # PID value
 integral = 0
