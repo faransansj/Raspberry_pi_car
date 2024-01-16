@@ -1,7 +1,41 @@
 import RPi.GPIO as GPIO
 from time import sleep
 import math
+'''
+\\\\\\\\\\\\\\\\\\\\\\\\\
+\\ PID control setting \\
+\\\\\\\\\\\\\\\\\\\\\\\\\
+'''
+# PID parameter
+Kp = 1.0  # Proportional
+Ki = 0.0  # Integral
+Kd = 0.0  # Derivative
 
+# PID value
+integral = 0
+last_error = 0
+
+# calculate pid
+def calculate_pid(setpoint, measured_value):
+    global integral, last_error
+    # Calculate error
+    error = setpoint - measured_value
+    
+    P_out = Kp * error
+
+    integral += error
+    I_out = Ki * integral
+
+    derivative = error - last_error
+    D_out = Kd * derivative
+
+    # Total output
+    output = P_out + I_out + D_out
+    # Save error for next loop
+    last_error = error
+
+    return output
+    
 # motor state
 STOP = 0
 FORWARD = 1
