@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math 
 
 video = cv2.VideoCapture(0)
 video.set(cv2.CAP_PROP_FRAME_WIDTH,320) # set the width to 320 p
@@ -42,6 +43,20 @@ def detect_line_segments(cropped_edges):
     min_threshold = 10 
     line_segments = cv2.HoughLinesP(cropped_edges, rho, theta, min_threshold,np.array([]), minLineLength=5, maxLineGap=0)
     return line_segments
+
+def make_points(frame, line):
+    height, width, _ = frame.shape
+    slope, intercept = line
+    y1 = height  # bottom of the frame
+    y2 = int(y1 / 2)  # make points from middle of the frame down
+
+    if slope == 0: 
+        slope = 0.1    
+
+    x1 = int((y1 - intercept) / slope)
+    x2 = int((y2 - intercept) / slope)
+
+    return [[x1, y1, x2, y2]]
 
 # slope calculate
 def average_slope_intercept(frame, line_segments):
@@ -90,20 +105,6 @@ def average_slope_intercept(frame, line_segments):
     # all coordinate points are in pixels
     return lane_lines
 
-def make_points(frame, line):
-    height, width, _ = frame.shape
-    slope, intercept = line
-    y1 = height  # bottom of the frame
-    y2 = int(y1 / 2)  # make points from middle of the frame down
-
-    if slope == 0: 
-        slope = 0.1    
-
-    x1 = int((y1 - intercept) / slope)
-    x2 = int((y2 - intercept) / slope)
-
-    return [[x1, y1, x2, y2]]
-
 # display line
 def display_lines(frame, lines, line_color=(0, 255, 0), line_width=6): # line color (B,G,R)
     line_image = np.zeros_like(frame)
@@ -141,7 +142,7 @@ def get_steering_angle(frame, lane_lines):
 
     return steering_angle
 
-def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_width=5 )
+def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_width=5 ):
 
     heading_image = np.zeros_like(frame)
     height, width, _ = frame.shape
