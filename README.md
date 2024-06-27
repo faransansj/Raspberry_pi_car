@@ -1,13 +1,16 @@
 # Raspberry_pi_car
 ## Title
 ### Chapter 1. Basic of Raspberry pi  
-  **1.1 about GPIO**  : 
-  **1.2 
+  **1.1 about GPIO**  
+  **1.2 **   
+  
 
 ### Chapter 2. Network
-  **2.1 SSH connect**
-  **2.2 VNC connect (feat.RealVNC)**
-  **Troble and Shooting : network connect error**
+  **2.1 SSH connect**  
+  **2.2 VNC connect (feat.RealVNC)**  
+  **2.3 Raspbian**  
+#### Special Lecture : python for Raspberry pi
+
 ### Chapter 3.   
 
 ### Chapter 4.  
